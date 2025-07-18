@@ -55,7 +55,7 @@ dependencies:
   permission_handler: ^12.0.0+1
   dio: ^5.8.0+1
   # share_plus: any #^6.3.4
-  flutter_media_metadata: ^1.0.0+1
+  # flutter_media_metadata: ^1.0.0
   flutter_colorpicker: ^1.1.0
   hive_flutter: ^1.1.0
   just_audio: ^0.9.46
@@ -114,48 +114,111 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  # ----
+  # fonts:
+  #   - family: AmiriQuran
+  #     fonts:
+  #       - asset: assets/fonts/AmiriQuran-Regular.ttf 
+  #   - family: Hafs
+  #     fonts:
+  #       - asset: assets/fonts/hafs-nastaleeq-ver10-org.otf
+  #   - family: Jomhuria
+  #     fonts:
+  #       - asset: assets/fonts/jomhuria-regular-full-org.ttf
+  #   - family: MeQuran
+  #     fonts:
+  #       - asset: assets/fonts/me_quran.ttf
+  #   - family: SurahNames
+  #     fonts:
+  #       - asset: assets/fonts/surah_names.ttf
+  #   - family: UthmanicHafs
+  #     fonts:
+  #       - asset: assets/fonts/UthmanicHafs1 Ver13.otf
+  #   - family: UthmanTN
+  #     fonts:
+  #       - asset: assets/fonts/UthmanTN1 Ver10.otf
+  #   - family: UthmanTNB
+  #     fonts:
+  #       - asset: assets/fonts/UthmanTN1B Ver10.otf
+  #   - family: QurStd
+  #     fonts:
+  #       - asset: assets/fonts/qur-std.ttf 
+    # - family: KFGQPC Uthmanic Script HAFS Regular
+    #   fonts:
+    #     - asset: assets/fonts/KFGQPC Uthmanic Script HAFS Regular.otf 
+  # ----
   fonts:
     - family: AmiriQuran
       fonts:
-        - asset: assets/fonts/AmiriQuran-Regular.ttf 
-    - family: Hafs
+        - asset: assets/fonts/AmiriQuran-Regular.ttf
+
+    - family: Taha
       fonts:
-        - asset: assets/fonts/hafs-nastaleeq-ver10-org.otf
-    - family: Jomhuria
-      fonts:
-        - asset: assets/fonts/jomhuria-regular-full-org.ttf
-    - family: MeQuran
+        - asset: assets/fonts/taha.ttf
+    - family: me
       fonts:
         - asset: assets/fonts/me_quran.ttf
-    - family: SurahNames
-      fonts:
-        - asset: assets/fonts/surah_names.ttf
-    - family: UthmanicHafs
+
+    - family: UthmanicHafs13
       fonts:
         - asset: assets/fonts/UthmanicHafs1 Ver13.otf
-    - family: UthmanTN
+
+    - family: "qaloon"
       fonts:
-        - asset: assets/fonts/UthmanTN1 Ver10.otf
-    - family: UthmanTNB
+        - asset: assets/fonts/qaloon.ttf
+
+    - family: "pdsm"
       fonts:
-        - asset: assets/fonts/UthmanTN1B Ver10.otf
-    - family: QurStd
+        - asset: assets/fonts/pdms.otf
+    - family: cairo
       fonts:
-        - asset: assets/fonts/qur-std.ttf 
-    - family: KFGQPC Uthmanic Script HAFS Regular
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
+    - family: "noor ehuda"
       fonts:
-        - asset: assets/fonts/KFGQPC Uthmanic Script HAFS Regular.otf 
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+        - asset: assets/fonts/noorehuda-org.ttf
+
+    - family: "hafs-nastaleeq-ver10-org"
+      fonts:
+        - asset: assets/fonts/hafs-nastaleeq-ver10-org.otf
+    - family: "hafs-smart-07"
+      fonts:
+        - asset: assets/fonts/hafs-smart-07.woff
+
+    - family: "jomhuria-regular-full-org"
+      fonts:
+        - asset: assets/fonts/jomhuria-regular-full-org.ttf
+
+    - family: "mada-regular-full"
+      fonts:
+        - asset: assets/fonts/mada-regular-full.ttf
+    - family: "markazi-text-regular-full-org"
+      fonts:
+        - asset: assets/fonts/markazi-text-regular-full-org.ttf
+    - family: "noto-kufi-arabic-regular-full"
+      fonts:
+        - asset: assets/fonts/noto-kufi-arabic-regular-full.ttf
+
+    - family: "qumbul-v7-full"
+      fonts:
+        - asset: assets/fonts/qumbul-v7-full.ttf
+    - family: "qur-std"
+      fonts:
+        - asset: assets/fonts/qur-std.ttf
+
+    - family: "shorooq-full-org"
+      fonts:
+        - asset: assets/fonts/shorooq-full-org.ttf
+
+    - family: "arsura"
+      fonts:
+        - asset: assets/fonts/arsura.ttf
+
+    - family: "KFGQPC Uthmanic Script HAFS Regular"
+      fonts:
+        - asset: assets/fonts/KFGQPC Uthmanic Script HAFS Regular.otf
+    - family: "roboto"
+      fonts:
+        - asset: assets/fonts/roboto.ttf
+
