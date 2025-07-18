@@ -9,6 +9,7 @@ import 'package:aquran/skoon/core/quran_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:quran/quran.dart' as quran;
 
@@ -17,12 +18,12 @@ String? quarterData;
 String languageCode = 'ar';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-try {
-  await LocalDB.init();
-} catch (e) {
-  print('Failed to initialize Hive: $e');
-  // Handle error (e.g., show user message)
-}
+  try {
+    await LocalDB.init();
+  } catch (e) {
+    print('Failed to initialize Hive: $e');
+    // Handle error (e.g., show user message)
+  }
   await loadData();
   runApp(const MyApp());
 }
@@ -63,6 +64,16 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
+      locale: const Locale('ar'), // Arabic language code
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'), // English
+        Locale('ar'), // Arabic
+      ],
       home: BlocProvider(
         create: (context) => QuranPagePlayerBloc(),
         child: SurahListPage(
