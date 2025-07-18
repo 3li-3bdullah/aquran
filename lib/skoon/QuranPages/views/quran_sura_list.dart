@@ -205,9 +205,9 @@ class _SurahListPageState extends State<SurahListPage> {
 
   // Define the tabs
   final List<Tab> tabs = <Tab>[
-    Tab(text: 'surah'.tr()),
-    Tab(text: 'juz'.tr()),
-    Tab(text: 'quarter'.tr()),
+   const  Tab(text: 'سورة',),
+   const  Tab(text: 'جزء'),
+    const Tab(text: 'ربع'),
   ];
   var ayatFiltered;
   GlobalKey scaffoldKey = GlobalKey<ScaffoldState>();
@@ -238,7 +238,7 @@ class _SurahListPageState extends State<SurahListPage> {
               //     image: AssetImage("assets/images/homebackground.png"),
               //     alignment: Alignment.topCenter,
               //     opacity: .256),
-              color: false ? quranPagesColorDark : quranPagesColorLight),
+              color: appPrimary),
           child: Scaffold(
               resizeToAvoidBottomInset: false,
               backgroundColor:
@@ -269,8 +269,7 @@ class _SurahListPageState extends State<SurahListPage> {
                                       color: primaryColors[0].withOpacity(.05),
                                       onTap: () async {
                                         {
-
-                                                  log('the 1 number');
+                                          log('the 1 number');
                                           await Navigator.push(
                                               context,
                                               CupertinoPageRoute(
@@ -285,14 +284,12 @@ class _SurahListPageState extends State<SurahListPage> {
                                                                     pageNumber:
                                                                         quran
                                                                             .getPageNumber(
-                                                                      int.parse(bookmarks[i]
-                                                                              [
-                                                                              "suraNumber"]
-                                                                          ?? "1"),
-                                                                      int.parse(bookmarks[i]
-                                                                              [
-                                                                              "verseNumber"]
-                                                                          ?? '1'),
+                                                                      int.parse(
+                                                                          bookmarks[i]["suraNumber"] ??
+                                                                              "1"),
+                                                                      int.parse(
+                                                                          bookmarks[i]["verseNumber"] ??
+                                                                              '1'),
                                                                     ),
                                                                     jsonData: widget
                                                                         .jsonData,
@@ -301,14 +298,12 @@ class _SurahListPageState extends State<SurahListPage> {
                                                                     highlightVerse:
                                                                         quran
                                                                             .getVerse(
-                                                                      int.parse(bookmarks[i]
-                                                                              [
-                                                                              "suraNumber"]
-                                                                          ?? '1'),
-                                                                      int.parse(bookmarks[i]
-                                                                              [
-                                                                              "verseNumber"]
-                                                                          ?? '1'),
+                                                                      int.parse(
+                                                                          bookmarks[i]["suraNumber"] ??
+                                                                              '1'),
+                                                                      int.parse(
+                                                                          bookmarks[i]["verseNumber"] ??
+                                                                              '1'),
                                                                     ),
                                                                     quarterJsonData:
                                                                         widget
@@ -425,8 +420,7 @@ class _SurahListPageState extends State<SurahListPage> {
                               .map((e) => EasyContainer(
                                   color: primaryColors[0].withOpacity(.05),
                                   onTap: () async {
-
-                                                  log('the 2 number');
+                                    log('the 2 number');
                                     await Navigator.push(
                                         context,
                                         CupertinoPageRoute(
@@ -502,26 +496,26 @@ class _SurahListPageState extends State<SurahListPage> {
               appBar: PreferredSize(
                 preferredSize: Size(MediaQuery.of(context).size.width, 80),
                 child: AppBar(
-                  actions: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 4.0, vertical: 8),
-                      child: Builder(builder: (context) {
-                        return IconButton(
-                            onPressed: () {
-                              Scaffold.of(context).openEndDrawer();
-                            },
-                            icon: const Icon(
-                              Iconsax.bookmark,
-                              color: backgroundColor,
-                            ));
-                      }),
-                    )
-                  ],
+                  // actions: [
+                  //   Padding(
+                  //     padding:
+                  //       const  EdgeInsets.symmetric(horizontal: 4.0, vertical: 8),
+                  //     child: Builder(builder: (context) {
+                  //       return IconButton(
+                  //           onPressed: () {
+                  //             Scaffold.of(context).openEndDrawer();
+                  //           },
+                  //           icon: const Icon(
+                  //             Iconsax.bookmark,
+                  //             color: backgroundColor,
+                  //           ));
+                  //     }),
+                  //   )
+                  // ],
                   leading: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                     child: IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.arrow_back_ios,
                           size: 20,
                           color: Colors.white,
@@ -544,10 +538,10 @@ class _SurahListPageState extends State<SurahListPage> {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: TabBar(
-                        indicatorPadding: EdgeInsets.symmetric(horizontal: 20),
+                        indicatorPadding: const EdgeInsets.symmetric(horizontal: 20),
                         indicatorSize: TabBarIndicatorSize.tab,
                         indicatorColor: Colors.white,
-                        indicatorWeight: 4,
+                        indicatorWeight: 4, labelColor: Colors.white,
                         tabs: tabs,
                         onTap: (index) {
                           setState(() {
@@ -558,15 +552,15 @@ class _SurahListPageState extends State<SurahListPage> {
                       ),
                     ),
                   ),
-                  shape: RoundedRectangleBorder(
+                  shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(16),
                           bottomRight: Radius.circular(16))),
                   elevation: 0,
                   centerTitle: true,
                   backgroundColor: false ? darkModeSecondaryColor : blueColor,
-                  title: Text(
-                    "alQuran".tr(),
+                  title: const Text(
+                    "إنجازي",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -715,23 +709,28 @@ class _SurahListPageState extends State<SurahListPage> {
                                                     });
                                                   }
                                                 },
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                     fontFamily: "aldahabi",
-                                                    color: false
-                                                        ? const Color.fromARGB(
-                                                            228, 255, 255, 255)
-                                                        : const Color.fromARGB(
+                                                    color:
+                                                    //  false
+                                                    //     ? const Color.fromARGB(
+                                                    //         228, 255, 255, 255)
+                                                    //     :
+                                                          Color.fromARGB(
                                                             190, 0, 0, 0)),
-                                                cursorColor: false
-                                                    ? quranPagesColorDark
-                                                    : quranPagesColorLight,
-                                                decoration: InputDecoration(
-                                                  hintText: 'searchQuran'.tr(),
+                                                cursorColor: appPrimary,
+                                                //  false
+                                                //     ? quranPagesColorDark
+                                                //     : quranPagesColorLight,
+                                                decoration: const InputDecoration(
+                                                  hintText: 'بحث...',
                                                   hintStyle: TextStyle(
                                                       fontFamily: "aldahabi",
-                                                      color: false
-                                                          ? Colors.white70
-                                                          : const Color
+                                                      color:
+                                                      //  false
+                                                      //     ? Colors.white70
+                                                      //     :
+                                                            Color
                                                               .fromARGB(
                                                               73, 0, 0, 0)),
                                                   border: InputBorder.none,
@@ -754,25 +753,26 @@ class _SurahListPageState extends State<SurahListPage> {
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: searchQuery.isNotEmpty
-                                                  ? Padding(
+                                                  ? const Padding(
                                                       padding:
-                                                          const EdgeInsets.all(
+                                                           EdgeInsets.all(
                                                               8.0),
                                                       child: Padding(
                                                         padding:
-                                                            const EdgeInsets
+                                                             EdgeInsets
                                                                 .all(8.0),
                                                         child: Icon(Icons.close,
-                                                            color: LocalDB
-                                                                    .getValue(
-                                                                        "darkMode")
-                                                                ? Colors.white70
-                                                                : const Color
-                                                                    .fromARGB(
-                                                                    73,
-                                                                    0,
-                                                                    0,
-                                                                    0)),
+                                                            color: Colors.black),
+                                                            // !LocalDB
+                                                            //         .getValue(
+                                                            //             "darkMode")
+                                                            //     ? Colors.white70
+                                                            //     : const Color
+                                                            //         .fromARGB(
+                                                            //         73,
+                                                            //         0,
+                                                            //         0,
+                                                            //         0)),
                                                       ),
                                                     )
                                                   : Container(
@@ -782,7 +782,7 @@ class _SurahListPageState extends State<SurahListPage> {
                                                                 .all(8.0),
                                                         child: Icon(
                                                             FontAwesome.search,
-                                                            color: true
+                                                            color: !LocalDB.getValue('darkMode')
                                                                 ? Colors.white70
                                                                 : const Color
                                                                     .fromARGB(
@@ -826,7 +826,6 @@ class _SurahListPageState extends State<SurahListPage> {
                                                 color:
                                                     goldColor.withOpacity(.05),
                                                 onTap: () {
-
                                                   log('the 4 number');
                                                   Navigator.push(
                                                       context,
@@ -893,7 +892,7 @@ class _SurahListPageState extends State<SurahListPage> {
                                             const NeverScrollableScrollPhysics(),
                                         separatorBuilder: (context, index) =>
                                             Padding(
-                                          padding: EdgeInsets.symmetric(
+                                          padding: const EdgeInsets.symmetric(
                                               horizontal: 8.0),
                                           child: Divider(
                                             color: Colors.grey.withOpacity(.5),
@@ -902,8 +901,8 @@ class _SurahListPageState extends State<SurahListPage> {
                                         itemCount: filteredData.length,
                                         itemBuilder: (context, index) {
                                           int suraNumber = index + 1;
-                                          String suraName = filteredData[index]
-                                              ["name"];
+                                          String suraName =
+                                              filteredData[index]["name"];
                                           String suraNameEnglishTranslated =
                                               filteredData[index]
                                                   ["englishNameTranslation"];
@@ -934,14 +933,13 @@ class _SurahListPageState extends State<SurahListPage> {
                                                     child: Text(
                                                       suraNumberInQuran
                                                           .toString(),
-                                                      style: TextStyle(
-                                                          color: orangeColor,
+                                                      style: const TextStyle(
+                                                          color: Colors.black,
                                                           fontSize: 14),
                                                     ),
                                                   ),
                                                 ) //  Material(
-
-                                                ,
+,
                                                 minVerticalPadding: 0,
                                                 title: SizedBox(
                                                   width: 90,
@@ -951,11 +949,11 @@ class _SurahListPageState extends State<SurahListPage> {
                                                         suraName,
                                                         style: TextStyle(
                                                             // fontWeight: FontWeight.bold,
-                                                            color: LocalDB
+                                                            color: !LocalDB
                                                                     .getValue(
                                                                         "darkMode")
                                                                 ? Colors.white70
-                                                                : blueColor,
+                                                                : appPrimary,
                                                             fontSize: 14,
                                                             fontWeight: FontWeight
                                                                 .w700, // Text color
@@ -987,21 +985,22 @@ class _SurahListPageState extends State<SurahListPage> {
                                                     ],
                                                   ),
                                                 ),
-                                                subtitle: Text(
-                                                  "$suraNameEnglishTranslated ($ayahCount)",
-                                                  style: TextStyle(
-                                                      fontFamily: "uthmanic",
-                                                      fontSize: 14,
-                                                      color: Colors.grey
-                                                          .withOpacity(.8)),
-                                                ),
+                                                // subtitle: Text(
+                                                //   "$suraNameEnglishTranslated ($ayahCount)",
+                                                //   style: TextStyle(
+                                                //       fontFamily: "uthmanic",
+                                                //       fontSize: 14,
+                                                //       color: Colors.grey
+                                                //           .withOpacity(.8)),
+                                                // ),
                                                 trailing: RichText(
                                                   text: TextSpan(
                                                     text: "$suraNumber",
                                                     style: TextStyle(
                                                         // fontWeight: FontWeight.bold,
-                                                        color: LocalDB.getValue(
-                                                                "darkMode")
+                                                        color: !LocalDB
+                                                                .getValue(
+                                                                    "darkMode")
                                                             ? Colors.white70
                                                             : Colors
                                                                 .black, //fontWeight: FontWeight.bold,
@@ -1011,33 +1010,26 @@ class _SurahListPageState extends State<SurahListPage> {
                                                   ),
                                                 ),
                                                 onTap: () async {
-
                                                   log('the 5 number');
                                                   await Navigator.push(
                                                       context,
                                                       CupertinoPageRoute(
-                                                          builder: (builder) =>
-                                                              BlocProvider(
-                                                                create: (context) =>
-                                                                    QuranPagePlayerBloc(),
-                                                                child: QuranDetailsPage(
-                                                                    shouldHighlightSura:
-                                                                        true,
-                                                                    shouldHighlightText:
-                                                                        false,
-                                                                    highlightVerse:
-                                                                        "",
-                                                                    jsonData: widget
-                                                                        .jsonData,
-                                                                    quarterJsonData:
-                                                                        widget
-                                                                            .quarterjsonData,
-                                                                    pageNumber:
-                                                                        quran.getPageNumber(
-                                                                            suraNumberInQuran, 1,
-                                                                            )),
-
-                                                              )));
+                                                          builder:
+                                                              (builder) =>
+                                                                  BlocProvider(
+                                                                    create: (context) =>
+                                                                        QuranPagePlayerBloc(),
+                                                                    child: QuranDetailsPage(
+                                                                        shouldHighlightSura: true,
+                                                                        shouldHighlightText: false,
+                                                                        highlightVerse: "",
+                                                                        jsonData: widget.jsonData,
+                                                                        quarterJsonData: widget.quarterjsonData,
+                                                                        pageNumber: quran.getPageNumber(
+                                                                          suraNumberInQuran,
+                                                                          1,
+                                                                        )),
+                                                                  )));
                                                   // Handle tapping on a sura item here
                                                   // You can navigate to the sura details page or perform any other action.
                                                 },
@@ -1160,8 +1152,7 @@ class _SurahListPageState extends State<SurahListPage> {
                                     ),
                               ),
                               onTap: () async {
-
-                                                  log('the 7 number');
+                                log('the 7 number');
                                 await Navigator.push(
                                     context,
                                     CupertinoPageRoute(
@@ -1271,8 +1262,7 @@ class _SurahListPageState extends State<SurahListPage> {
                                   ),
                             ),
                             onTap: () async {
-
-                                                  log('the 8 number');
+                              log('the 8 number');
                               await Navigator.push(
                                   context,
                                   CupertinoPageRoute(

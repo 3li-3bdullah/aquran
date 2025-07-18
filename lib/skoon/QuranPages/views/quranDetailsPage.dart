@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -5,9 +7,7 @@ import 'package:aquran/main.dart';
 import 'package:aquran/skoon/QuranPages/helpers/convertNumberToAr.dart';
 import 'package:aquran/skoon/QuranPages/helpers/translation/translationdata.dart';
 import 'package:aquran/skoon/QuranPages/widgets/bismallah.dart';
-import 'package:aquran/skoon/QuranPages/widgets/bookmark_dialog.dart';
 import 'package:aquran/skoon/QuranPages/widgets/header_widget.dart';
-import 'package:aquran/skoon/QuranPages/widgets/tafseer_and_translation_sheet.dart';
 import 'package:aquran/skoon/controllers/hadith_bloc.dart';
 import 'package:aquran/skoon/controllers/player_bar_bloc.dart';
 import 'package:aquran/skoon/controllers/player_bloc_bloc.dart';
@@ -18,7 +18,7 @@ import 'package:aquran/skoon/models/reciter.dart';
 import 'package:dio/dio.dart';
 import 'package:easy_localization/easy_localization.dart';
 // import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_media_metadata/flutter_media_metadata.dart';
+// import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:fluttericon/linearicons_free_icons.dart';
 import 'package:path_provider/path_provider.dart';
@@ -33,8 +33,7 @@ import 'package:fluttericon/font_awesome5_icons.dart';
 import 'package:fluttericon/font_awesome_icons.dart';
 import 'package:fluttericon/mfg_labs_icons.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:flutter_material_color_picker/flutter_material_color_picker.dart';
-
+import 'package:just_audio/just_audio.dart';
 import 'package:easy_container/easy_container.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -168,7 +167,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
   }
 
   int playIndexPage = 0;
-
+StreamSubscription<Duration>? _positionSubscription;
   @override
   void initState() {
     fetchBookmarks();
@@ -441,27 +440,29 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                   onPressed: () {
                                                     Navigator.pop(context);
                                                   },
-                                                  icon: Icon(
-                                                    Icons.arrow_back_ios,
-                                                    size: 24,
-                                                    color: secondaryColors[
-                                                        LocalDB.getValue(
-                                                                "quranPageolorsindex") ??
-                                                            0 ??
-                                                            0],
-                                                  )),
+                                                  icon: const Icon(
+                                                      Icons.arrow_back_ios,
+                                                      size: 24,
+                                                      color: appPrimary
+                                                      // secondaryColors[
+                                                      //     LocalDB.getValue(
+                                                      //             "quranPageolorsindex") ??
+                                                      //         0 ??
+                                                      //         0],
+                                                      )),
                                               Text(
                                                   widget.jsonData[
                                                       quran.getPageData(
                                                                   index)[0]
                                                               ["surah"] -
                                                           1]["name"],
-                                                  style: TextStyle(
-                                                      color: secondaryColors[
-                                                          LocalDB.getValue(
-                                                                  "quranPageolorsindex") ??
-                                                              0 ??
-                                                              0],
+                                                  style: const TextStyle(
+                                                      color: appPrimary,
+                                                      //  secondaryColors[
+                                                      //     LocalDB.getValue(
+                                                      //             "quranPageolorsindex") ??
+                                                      //         0 ??
+                                                      //         0],
                                                       fontFamily: "Taha",
                                                       fontSize: 14)),
                                             ],
@@ -487,17 +488,20 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                       .includesQuarter)
                                                     EasyContainer(
                                                       borderRadius: 12,
-                                                      color: secondaryColors[
-                                                              LocalDB.getValue(
-                                                                      "quranPageolorsindex") ??
-                                                                  0 ??
-                                                                  0]
-                                                          .withOpacity(.5),
-                                                      borderColor: primaryColors[
-                                                          LocalDB.getValue(
-                                                                  "quranPageolorsindex") ??
-                                                              0 ??
-                                                              0],
+                                                      color: appPrimary
+                                                          .withOpacity(0.5),
+                                                      //  secondaryColors[
+                                                      //         LocalDB.getValue(
+                                                      //                 "quranPageolorsindex") ??
+                                                      //             0 ??
+                                                      //             0]
+                                                      //     .withOpacity(.5),
+                                                      borderColor: appPrimary,
+                                                      //  primaryColors[
+                                                      //     LocalDB.getValue(
+                                                      //             "quranPageolorsindex") ??
+                                                      //         0 ??
+                                                      //         0],
                                                       showBorder: true,
                                                       height: 20,
                                                       width: 160,
@@ -512,8 +516,8 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                                         indexes)
                                                                     .includesQuarter ==
                                                                 true
-                                                            ? "${"page".tr()} ${(index).toString()} | ${(checkIfPageIncludesQuarterAndQuarterIndex(widget.quarterJsonData, quran.getPageData(index), indexes).quarterIndex + 1) == 1 ? "" : "${(checkIfPageIncludesQuarterAndQuarterIndex(widget.quarterJsonData, quran.getPageData(index), indexes).quarterIndex).toString()}/${4.toString()}"} ${"hizb".tr()} ${(checkIfPageIncludesQuarterAndQuarterIndex(widget.quarterJsonData, quran.getPageData(index), indexes).hizbIndex + 1).toString()} | ${"juz".tr()} ${getJuzNumber(getPageData(index)[0]["surah"], getPageData(index)[0]["start"])} "
-                                                            : "${"page".tr()} $index | ${"juz".tr()} ${getJuzNumber(getPageData(index)[0]["surah"], getPageData(index)[0]["start"])}",
+                                                            ? "${"صفحة"} ${(index).toString()} | ${(checkIfPageIncludesQuarterAndQuarterIndex(widget.quarterJsonData, quran.getPageData(index), indexes).quarterIndex + 1) == 1 ? "" : "${(checkIfPageIncludesQuarterAndQuarterIndex(widget.quarterJsonData, quran.getPageData(index), indexes).quarterIndex).toString()}/${4.toString()}"} ${"hizb".tr()} ${(checkIfPageIncludesQuarterAndQuarterIndex(widget.quarterJsonData, quran.getPageData(index), indexes).hizbIndex + 1).toString()} | ${"juz".tr()} ${getJuzNumber(getPageData(index)[0]["surah"], getPageData(index)[0]["start"])} "
+                                                            : "${"صفحة"} $index | ${"جزء"} ${getJuzNumber(getPageData(index)[0]["surah"], getPageData(index)[0]["start"])}",
                                                         style: TextStyle(
                                                           fontFamily:
                                                               'aldahabi',
@@ -536,11 +540,12 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                     false)
                                                   EasyContainer(
                                                     borderRadius: 12,
-                                                    color: secondaryColors[
-                                                            LocalDB.getValue(
-                                                                    "quranPageolorsindex") ??
-                                                                0]
-                                                        .withOpacity(.5),
+                                                    color: appPrimary,
+                                                    // secondaryColors[
+                                                    //         LocalDB.getValue(
+                                                    //                 "quranPageolorsindex") ??
+                                                    //             0]
+                                                    // .withOpacity(.5),
                                                     borderColor: backgroundColors[
                                                         LocalDB.getValue(
                                                                 "quranPageolorsindex") ??
@@ -552,7 +557,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                     margin: 0,
                                                     child: Center(
                                                       child: Text(
-                                                        "${"page".tr()} $index | ${"juz".tr()} ${getJuzNumber(getPageData(index)[0]["surah"], getPageData(index)[0]["start"])}",
+                                                        "${"صفحة"} $index | ${"جزء".tr()} ${getJuzNumber(getPageData(index)[0]["surah"], getPageData(index)[0]["start"])}",
                                                         style: TextStyle(
                                                           fontFamily:
                                                               'aldahabi',
@@ -577,15 +582,16 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                             children: [
                                               IconButton(
                                                   onPressed: () {
-                                                    showSettingsSheet(context);
+                                                    // showSettingsSheet(context);
                                                   },
-                                                  icon: Icon(
-                                                    Icons.settings,
+                                                  icon: const Icon(
+                                                    Icons.search,
                                                     size: 24,
-                                                    color: secondaryColors[
-                                                        LocalDB.getValue(
-                                                                "quranPageolorsindex") ??
-                                                            0],
+                                                    color: appPrimary,
+                                                    // secondaryColors[
+                                                    //     LocalDB.getValue(
+                                                    //             "quranPageolorsindex") ??
+                                                    //         0],
                                                   ))
                                             ],
                                           ),
@@ -616,11 +622,12 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                         richTextKeys[index - 1],
                                                     textDirection:
                                                         m.TextDirection.rtl,
+                                                    //todo the Ayah alignment
                                                     textAlign: (index == 1 ||
                                                             index == 2 ||
                                                             index > 570)
                                                         ? TextAlign.center
-                                                        : TextAlign.center,
+                                                        : TextAlign.justify,
                                                     softWrap: true,
                                                     locale: const Locale("ar"),
                                                     text: TextSpan(
@@ -719,33 +726,16 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                             //ToDo: icommented and poate the above
                                                             text: i ==
                                                                     e["start"]
-                                                                ? "${quran.getVerse(e["surah"], i).replaceAll(" ", "").substring(0, 1)}\u200A${quran.getVerse(e["surah"], i).replaceAll(" ", "").substring(1)}"
+                                                                ? "${quran.getVerse(e["surah"], i).replaceAll(" ", " ")}"
                                                                 : quran
                                                                     .getVerse(
                                                                         e[
                                                                             "surah"],
                                                                         i)
                                                                     .replaceAll(
-                                                                        ' ',
-                                                                        ''),
-                                                            //todo:2
-                                                            // text: i ==
-                                                            //         e["start"]
-                                                            //     ? "${quran.getVerse(e["surah"], i).substring(0, 1)}\u200A${quran.getVerse(e["surah"], i).substring(1)}"
-                                                            //     : quran.getVerse(
-                                                            //         e["surah"],
-                                                            //         i),
-                                                            //Todo:1
-                                                            // text: i ==
-                                                            //         e["start"]
-                                                            //     ? "${quran.getVerse(e["surah"], i).substring(0, 1)}\u200A${quran.getVerse(e["surah"], i).substring(1)}"
-                                                            //     : quran.getVerse(
-                                                            //         e["surah"],
-                                                            //         i),
-                                                            //  i == e["start"]
-                                                            // ? "${quran.getVerseQCF(e["surah"], i).replaceAll(" ", "").substring(0, 1)}\u200A${quran.getVerseQCF(e["surah"], i).replaceAll(" ", "").substring(1).substring(0,  quran.getVerseQCF(e["surah"], i).replaceAll(" ", "").substring(1).length - 1)}"
-                                                            // :
-                                                            // quran.getVerseQCF(e["surah"], i).replaceAll(' ', '').substring(0,  quran.getVerseQCF(e["surah"], i).replaceAll(' ', '').length - 1),
+                                                                        RegExp(
+                                                                            r'\s+'),
+                                                                        ' '),
                                                             style: TextStyle(
                                                               color: bookmarks
                                                                       .where((element) =>
@@ -767,10 +757,12 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                                           2)
                                                                   ? 2
                                                                   : 1.95,
-                                                              letterSpacing: 0,
-                                                              wordSpacing: 0,
+                                                              // letterSpacing:
+                                                              //     0.5,
+                                                              wordSpacing: 1,
                                                               fontFamily:
-                                                                  "QCF_P${index.toString().padLeft(3, "0")}",
+                                                                  'UthmanicHafs13',
+                                                              // "QCF_P${index.toString().padLeft(3, "0")}",
                                                               fontSize: index ==
                                                                           1 ||
                                                                       index == 2
@@ -795,6 +787,22 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                             ),
                                                             children: const <TextSpan>[],
                                                           ));
+                                                          spans.add(
+                                                            TextSpan(
+                                                              text: quran
+                                                                  .getVerseEndSymbol(
+                                                                      i),
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize: 18,
+                                                                color:
+                                                                    primaryColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          );
                                                         }
                                                         return spans;
                                                       }).toList(),
@@ -967,8 +975,8 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                                                 "surah"],
                                                                             i)
                                                                         .replaceAll(
-                                                                            ' ',
-                                                                            ''),
+                                                                            RegExp(r'\s+'),
+                                                                            ' '),
                                                                     style:
                                                                         TextStyle(
                                                                       color: primaryColors[
@@ -980,7 +988,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                                           ? 2
                                                                           : 1.95,
                                                                       letterSpacing:
-                                                                          0,
+                                                                          0.5,
                                                                       // fontSize: 22,
                                                                       // wordSpacing: -1.4,
                                                                       fontFamily:
@@ -1008,6 +1016,22 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                                     ),
                                                                     children: const [],
                                                                   ));
+                                                                  spans.add(
+                                                                    TextSpan(
+                                                                      text: quran
+                                                                          .getVerseEndSymbol(
+                                                                              i),
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            18,
+                                                                        color:
+                                                                            primaryColor,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                    ),
+                                                                  );
                                                                   if (bookmarks
                                                                       .where((element) =>
                                                                           element["suraNumber"] ==
@@ -1181,7 +1205,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                                                             ? 2
                                                                             : 1.95,
                                                                         letterSpacing:
-                                                                            0,
+                                                                            0.5,
                                                                         // fontSize: 22,
                                                                         // wordSpacing: -1.4,
                                                                         fontFamily:
@@ -3027,7 +3051,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                 children: [
                                   DropdownButton<int>(
                                     value:
-                                        LocalDB.getValue("reciterindex") ?? 0,
+                                        LocalDB.getValue("reciterIndex") ?? 0,
                                     dropdownColor: backgroundColors[
                                         LocalDB.getValue(
                                                 "quranPageolorsindex") ??
@@ -3041,7 +3065,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                           quran.getVerseCount(state.suraNumber),
                                           state.suraNumber,
                                           reciters[LocalDB.getValue(
-                                                      "reciterindex") ??
+                                                      "reciterIndex") ??
                                                   0]
                                               .identifier);
                                       state.player.dispose();
@@ -3076,7 +3100,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                       qurapPagePlayerBloc.add(PlayFromVerse(
                                           currentVersePlaying,
                                           reciters[LocalDB.getValue(
-                                                      "reciterindex") ??
+                                                      "reciterIndex") ??
                                                   0]
                                               .identifier,
                                           state.suraNumber,
@@ -3887,355 +3911,355 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                     LocalDB.getValue("quranPageolorsindex") ??
                                         0]),
                           ),
-                          trailing: SizedBox(
-                            width: 200,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                    onPressed: () {
-                                      isVerseStarred(surahNumber, verseNumber)
-                                          ? removeStarredVerse(
-                                              surahNumber, verseNumber)
-                                          : addStarredVerse(
-                                              surahNumber, verseNumber);
-                                      setstatee(() {});
-                                      setState(() {});
-                                      richTextKeys[index - 1]
-                                          .currentState
-                                          ?.build(context);
-                                    },
-                                    icon: Icon(
-                                      isVerseStarred(surahNumber, verseNumber)
-                                          ? FontAwesome.star
-                                          : FontAwesome.star_empty,
-                                      color: primaryColors[LocalDB.getValue(
-                                              "quranPageolorsindex") ??
-                                          0],
-                                    )),
-                                IconButton(
-                                    onPressed: () {
-                                      takeScreenshotFunction(
-                                          index, surahNumber, verseNumber);
-                                    },
-                                    icon: Icon(Icons.share,
-                                        color: primaryColors[LocalDB.getValue(
-                                                "quranPageolorsindex") ??
-                                            0])),
-                              ],
-                            ),
-                          ),
+                          // trailing: SizedBox(
+                          //   width: 200,
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.end,
+                          //     children: [
+                          //       IconButton(
+                          //           onPressed: () {
+                          //             isVerseStarred(surahNumber, verseNumber)
+                          //                 ? removeStarredVerse(
+                          //                     surahNumber, verseNumber)
+                          //                 : addStarredVerse(
+                          //                     surahNumber, verseNumber);
+                          //             setstatee(() {});
+                          //             setState(() {});
+                          //             richTextKeys[index - 1]
+                          //                 .currentState
+                          //                 ?.build(context);
+                          //           },
+                          //           icon: Icon(
+                          //             isVerseStarred(surahNumber, verseNumber)
+                          //                 ? FontAwesome.star
+                          //                 : FontAwesome.star_empty,
+                          //             color: primaryColors[LocalDB.getValue(
+                          //                     "quranPageolorsindex") ??
+                          //                 0],
+                          //           )),
+                          //       IconButton(
+                          //           onPressed: () {
+                          //             takeScreenshotFunction(
+                          //                 index, surahNumber, verseNumber);
+                          //           },
+                          //           icon: Icon(Icons.share,
+                          //               color: primaryColors[LocalDB.getValue(
+                          //                       "quranPageolorsindex") ??
+                          //                   0])),
+                          //     ],
+                          //   ),
+                          // ),
                         ),
                         Divider(
                           height: 10,
                           color: primaryColors[
                               LocalDB.getValue("quranPageolorsindex") ?? 0],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              color: primaryColors[
-                                      LocalDB.getValue("quranPageolorsindex") ??
-                                          0]
-                                  .withOpacity(.05),
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  if (bookmarks.isNotEmpty)
-                                    ListView.separated(
-                                        separatorBuilder: (context, index) =>
-                                            const Divider(),
-                                        shrinkWrap: true,
-                                        physics:
-                                            const NeverScrollableScrollPhysics(),
-                                        itemCount: bookmarks.length,
-                                        itemBuilder: (c, i) {
-                                          return GestureDetector(
-                                            // color: Colors.transparent,
-                                            onTap: () async {
-                                              List bookmarks = json.decode(
-                                                  LocalDB.getValue(
-                                                      "bookmarks"));
+                        // Padding(
+                        // padding: const EdgeInsets.all(8.0),
+                        // child: Container(
+                        //   decoration: BoxDecoration(
+                        //     borderRadius: BorderRadius.circular(18),
+                        //     color: primaryColors[
+                        //             LocalDB.getValue("quranPageolorsindex") ??
+                        //                 0]
+                        //         .withOpacity(.05),
+                        //   ),
+                        //   child: Center(
+                        //     child: Column(
+                        //       mainAxisAlignment: MainAxisAlignment.start,
+                        //       children: [
+                        //         // if (bookmarks.isNotEmpty)
+                        //           // ListView.separated(
+                        //               // separatorBuilder: (context, index) =>
+                        //               //     const Divider(),
+                        //               // shrinkWrap: true,
+                        //               // physics:
+                        //               //     const NeverScrollableScrollPhysics(),
+                        //               // itemCount: bookmarks.length,
+                        //               // itemBuilder: (c, i) {
+                        //               //   return GestureDetector(
+                        //               //     // color: Colors.transparent,
+                        //               //     onTap: () async {
+                        //               //       List bookmarks = json.decode(
+                        //               //           LocalDB.getValue(
+                        //               //               "bookmarks"));
 
-                                              bookmarks[i]["verseNumber"] =
-                                                  verseNumber;
+                        //               //       bookmarks[i]["verseNumber"] =
+                        //               //           verseNumber;
 
-                                              bookmarks[i]["suraNumber"] =
-                                                  surahNumber;
+                        //               //       bookmarks[i]["suraNumber"] =
+                        //               //           surahNumber;
 
-                                              LocalDB.updateValue("bookmarks",
-                                                  json.encode(bookmarks));
-                                              // print(LocalDB.getValue("bookmarks"));
-                                              setState(() {});
-                                              fetchBookmarks();
-                                              Navigator.of(context)
-                                                  .pop(); // Close the dialog
-                                            },
-                                            child: SizedBox(
-                                              width: MediaQuery.of(context)
-                                                  .size
-                                                  .width,
-                                              child: Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  Icon(
-                                                    Icons.bookmark,
-                                                    color: Color(int.parse(
-                                                        "0x${bookmarks[i]["color"]}")),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 20,
-                                                  ),
-                                                  Text(bookmarks[i]["name"],
-                                                      style: TextStyle(
-                                                          fontFamily: "cairo",
-                                                          fontSize: 14,
-                                                          color: primaryColors[
-                                                              LocalDB.getValue(
-                                                                      "quranPageolorsindex") ??
-                                                                  0])),
-                                                  SizedBox(
-                                                    width: 30,
-                                                  ),
-                                                  // if (LocalDB.getValue("redBookmark") != null)
-                                                  Expanded(
-                                                    child: Align(
-                                                      alignment:
-                                                          Alignment.centerRight,
-                                                      child: Text(
-                                                          getVerse(
-                                                            int.parse(bookmarks[
-                                                                        i][
-                                                                    "suraNumber"]
-                                                                .toString()),
-                                                            int.parse(bookmarks[
-                                                                        i][
-                                                                    "verseNumber"]
-                                                                .toString()),
-                                                          ),
-                                                          textDirection: m
-                                                              .TextDirection
-                                                              .rtl,
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  fontFamilies[
-                                                                      0],
-                                                              fontSize: 13,
-                                                              color: primaryColors[
-                                                                  LocalDB.getValue(
-                                                                          "quranPageolorsindex") ??
-                                                                      0],
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis)),
-                                                    ),
-                                                  ),
+                        //               //       LocalDB.updateValue("bookmarks",
+                        //               //           json.encode(bookmarks));
+                        //               //       // print(LocalDB.getValue("bookmarks"));
+                        //               //       setState(() {});
+                        //               //       fetchBookmarks();
+                        //               //       Navigator.of(context)
+                        //               //           .pop(); // Close the dialog
+                        //               //     },
+                        //               //     child: SizedBox(
+                        //               //       width: MediaQuery.of(context)
+                        //               //           .size
+                        //               //           .width,
+                        //               //       child: Row(
+                        //               //         children: [
+                        //               //           SizedBox(
+                        //               //             width: 20,
+                        //               //           ),
+                        //               //           Icon(
+                        //               //             Icons.bookmark,
+                        //               //             color: Color(int.parse(
+                        //               //                 "0x${bookmarks[i]["color"]}")),
+                        //               //           ),
+                        //               //           SizedBox(
+                        //               //             width: 20,
+                        //               //           ),
+                        //               //           Text(bookmarks[i]["name"],
+                        //               //               style: TextStyle(
+                        //               //                   fontFamily: "cairo",
+                        //               //                   fontSize: 14,
+                        //               //                   color: primaryColors[
+                        //               //                       LocalDB.getValue(
+                        //               //                               "quranPageolorsindex") ??
+                        //               //                           0])),
+                        //               //           SizedBox(
+                        //               //             width: 30,
+                        //               //           ),
+                        //               //           // if (LocalDB.getValue("redBookmark") != null)
+                        //               //           Expanded(
+                        //               //             child: Align(
+                        //               //               alignment:
+                        //               //                   Alignment.centerRight,
+                        //               //               child: Text(
+                        //               //                   getVerse(
+                        //               //                     int.parse(bookmarks[
+                        //               //                                 i][
+                        //               //                             "suraNumber"]
+                        //               //                         .toString()),
+                        //               //                     int.parse(bookmarks[
+                        //               //                                 i][
+                        //               //                             "verseNumber"]
+                        //               //                         .toString()),
+                        //               //                   ),
+                        //               //                   textDirection: m
+                        //               //                       .TextDirection
+                        //               //                       .rtl,
+                        //               //                   style: TextStyle(
+                        //               //                       fontFamily:
+                        //               //                           fontFamilies[
+                        //               //                               0],
+                        //               //                       fontSize: 13,
+                        //               //                       color: primaryColors[
+                        //               //                           LocalDB.getValue(
+                        //               //                                   "quranPageolorsindex") ??
+                        //               //                               0],
+                        //               //                       overflow:
+                        //               //                           TextOverflow
+                        //               //                               .ellipsis)),
+                        //               //             ),
+                        //               //           ),
 
-                                                  IconButton(
-                                                      onPressed: () {
-                                                        //  String bookmarkName = _nameController.text;
-                                                        // TODO: Perform actions with bookmarkName and _selectedColor
-                                                        List bookmarks =
-                                                            json.decode(LocalDB
-                                                                .getValue(
-                                                                    "bookmarks"));
-                                                        // String hexCode =
-                                                        //     _selectedColor.value.toRadixString(16).padLeft(8, '0');
-                                                        Fluttertoast.showToast(
-                                                            msg:
-                                                                "${bookmarks[i]["name"]} removed");
+                        //               //           IconButton(
+                        //               //               onPressed: () {
+                        //               //                 //  String bookmarkName = _nameController.text;
+                        //               //                 // TODO: Perform actions with bookmarkName and _selectedColor
+                        //               //                 List bookmarks =
+                        //               //                     json.decode(LocalDB
+                        //               //                         .getValue(
+                        //               //                             "bookmarks"));
+                        //               //                 // String hexCode =
+                        //               //                 //     _selectedColor.value.toRadixString(16).padLeft(8, '0');
+                        //               //                 Fluttertoast.showToast(
+                        //               //                     msg:
+                        //               //                         "${bookmarks[i]["name"]} removed");
 
-                                                        bookmarks.removeWhere(
-                                                            (e) =>
-                                                                e["color"] ==
-                                                                bookmarks[i]
-                                                                    ["color"]);
-                                                        LocalDB.updateValue(
-                                                            "bookmarks",
-                                                            json.encode(
-                                                                bookmarks));
-                                                        // print(LocalDB.getValue("bookmarks"));
-                                                        setState(() {});
-                                                        fetchBookmarks();
-                                                        Navigator.of(context)
-                                                            .pop(); // Close the dialog
-                                                      },
-                                                      icon: Icon(
-                                                        Icons.delete,
-                                                        color: Color(int.parse(
-                                                            "0x${bookmarks[i]["color"]}")),
-                                                      ))
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }),
-                                  if (bookmarks.isNotEmpty) const Divider(),
-                                  EasyContainer(
-                                    color: Colors.transparent,
-                                    onTap: () async {
-                                      await showDialog(
-                                          context: context,
-                                          builder: (context) => BookmarksDialog(
-                                                suraNumber: surahNumber,
-                                                verseNumber: verseNumber,
-                                              ));
+                        //               //                 bookmarks.removeWhere(
+                        //               //                     (e) =>
+                        //               //                         e["color"] ==
+                        //               //                         bookmarks[i]
+                        //               //                             ["color"]);
+                        //               //                 LocalDB.updateValue(
+                        //               //                     "bookmarks",
+                        //               //                     json.encode(
+                        //               //                         bookmarks));
+                        //               //                 // print(LocalDB.getValue("bookmarks"));
+                        //               //                 setState(() {});
+                        //               //                 fetchBookmarks();
+                        //               //                 Navigator.of(context)
+                        //               //                     .pop(); // Close the dialog
+                        //               //               },
+                        //               //               icon: Icon(
+                        //               //                 Icons.delete,
+                        //               //                 color: Color(int.parse(
+                        //               //                     "0x${bookmarks[i]["color"]}")),
+                        //               //               ))
+                        //               //         ],
+                        //               //       ),
+                        //               //     ),
+                        //               //   );
+                        //               // }),
+                        //         if (bookmarks.isNotEmpty) const Divider(),
+                        //         EasyContainer(
+                        //           color: Colors.transparent,
+                        //           onTap: () async {
+                        //             await showDialog(
+                        //                 context: context,
+                        //                 builder: (context) => BookmarksDialog(
+                        //                       suraNumber: surahNumber,
+                        //                       verseNumber: verseNumber,
+                        //                     ));
 
-                                      fetchBookmarks();
-                                    },
-                                    child: SizedBox(
-                                      width: MediaQuery.of(context).size.width,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 20,
-                                          ),
-                                          Icon(
-                                            Icons.bookmark_add,
-                                            color: secondaryColors[
-                                                LocalDB.getValue(
-                                                        "quranPageolorsindex") ??
-                                                    0],
-                                          ),
-                                          SizedBox(
-                                            width: 20,
-                                          ),
-                                          Text("newBookmark".tr(),
-                                              style: TextStyle(
-                                                  fontFamily: "cairo",
-                                                  fontSize: 14,
-                                                  color: primaryColors[
-                                                      LocalDB.getValue(
-                                                              "quranPageolorsindex") ??
-                                                          0])),
-                                          SizedBox(
-                                            width: 30,
-                                          ),
-                                          if (LocalDB.getValue("redBookmark") !=
-                                              null)
-                                            Expanded(
-                                              child: Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: Text(
-                                                    getVerse(
-                                                      int.parse(
-                                                          LocalDB.getValue(
-                                                                  "redBookmark")
-                                                              .toString()
-                                                              .split('-')[0]),
-                                                      int.parse(
-                                                          LocalDB.getValue(
-                                                                  "redBookmark")
-                                                              .toString()
-                                                              .split('-')[1]),
-                                                    ),
-                                                    textDirection:
-                                                        m.TextDirection.rtl,
-                                                    style: TextStyle(
-                                                        fontFamily:
-                                                            fontFamilies[0],
-                                                        fontSize: 13,
-                                                        color: primaryColors[
-                                                            LocalDB.getValue(
-                                                                    "quranPageolorsindex") ??
-                                                                0],
-                                                        overflow: TextOverflow
-                                                            .ellipsis)),
-                                              ),
-                                            )
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        EasyContainer(
-                          color: primaryColors[
-                                  LocalDB.getValue("quranPageolorsindex") ?? 0]
-                              .withOpacity(.05),
-                          borderRadius: 8,
-                          onTap: () {
-                            showModalBottomSheet(
-                                enableDrag: true,
-                                // backgroundColor: Colors.transparent,
-                                context: context,
-                                // animationCurve: Curves.easeInOutQuart,
-                                elevation: 0,
-                                // bounce: true,
-                                // duration: const Duration(milliseconds: 400),
-                                backgroundColor: backgroundColor,
-                                // Set this to true
-                                // backgroundColor: Colors.transparent, // Set background color to transparent
-                                // useSafeArea: true,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(13),
-                                        topLeft: Radius.circular(13))),
-                                isDismissible: true,
-                                // constraints: BoxConstraints.expand(
-                                //   height: MediaQuery.of(context).size.height,
-                                // ),
-                                builder: (d) {
-                                  return TafseerAndTranslateSheet(
-                                      surahNumber: surahNumber,
-                                      isVerseByVerseSelection: false,
-                                      verseNumber: verseNumber);
-                                });
-                          },
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Icon(
-                                  FontAwesome5.book_open,
-                                  color:
-                                      LocalDB.getValue("quranPageolorsindex") ??
-                                              0 == 0
-                                          ? secondaryColors[
-                                              LocalDB.getValue(
-                                                      "quranPageolorsindex") ??
-                                                  0]
-                                          : highlightColors[LocalDB.getValue(
-                                                  "quranPageolorsindex") ??
-                                              0],
-                                ),
-                                SizedBox(
-                                  width: 20,
-                                ),
-                                Text(
-                                    "${"tafseer".tr()} - ${"translation".tr()}",
-                                    style: TextStyle(
-                                        fontFamily: "cairo",
-                                        fontSize: 14,
-                                        color: primaryColors[LocalDB.getValue(
-                                                "quranPageolorsindex") ??
-                                            0])),
-                                SizedBox(
-                                  width: 30,
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
+                        //             fetchBookmarks();
+                        //           },
+                        //           child: SizedBox(
+                        //             width: MediaQuery.of(context).size.width,
+                        //             child: Row(
+                        //               children: [
+                        //                 SizedBox(
+                        //                   width: 20,
+                        //                 ),
+                        //                 Icon(
+                        //                   Icons.bookmark_add,
+                        //                   color: secondaryColors[
+                        //                       LocalDB.getValue(
+                        //                               "quranPageolorsindex") ??
+                        //                           0],
+                        //                 ),
+                        //                 SizedBox(
+                        //                   width: 20,
+                        //                 ),
+                        //                 Text("newBookmark".tr(),
+                        //                     style: TextStyle(
+                        //                         fontFamily: "cairo",
+                        //                         fontSize: 14,
+                        //                         color: primaryColors[
+                        //                             LocalDB.getValue(
+                        //                                     "quranPageolorsindex") ??
+                        //                                 0])),
+                        //                 SizedBox(
+                        //                   width: 30,
+                        //                 ),
+                        //                 if (LocalDB.getValue("redBookmark") !=
+                        //                     null)
+                        //                   Expanded(
+                        //                     child: Align(
+                        //                       alignment:
+                        //                           Alignment.centerRight,
+                        //                       child: Text(
+                        //                           getVerse(
+                        //                             int.parse(
+                        //                                 LocalDB.getValue(
+                        //                                         "redBookmark")
+                        //                                     .toString()
+                        //                                     .split('-')[0]),
+                        //                             int.parse(
+                        //                                 LocalDB.getValue(
+                        //                                         "redBookmark")
+                        //                                     .toString()
+                        //                                     .split('-')[1]),
+                        //                           ),
+                        //                           textDirection:
+                        //                               m.TextDirection.rtl,
+                        //                           style: TextStyle(
+                        //                               fontFamily:
+                        //                                   fontFamilies[0],
+                        //                               fontSize: 13,
+                        //                               color: primaryColors[
+                        //                                   LocalDB.getValue(
+                        //                                           "quranPageolorsindex") ??
+                        //                                       0],
+                        //                               overflow: TextOverflow
+                        //                                   .ellipsis)),
+                        //                     ),
+                        //                   )
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         )
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
+                        // ),
+                        // SizedBox(
+                        //   height: 10,
+                        // ),
+                        // EasyContainer(
+                        // color: primaryColors[
+                        //         LocalDB.getValue("quranPageolorsindex") ?? 0]
+                        //     .withOpacity(.05),
+                        // borderRadius: 8,
+                        // onTap: () {
+                        //   showModalBottomSheet(
+                        //       enableDrag: true,
+                        //       // backgroundColor: Colors.transparent,
+                        //       context: context,
+                        //       // animationCurve: Curves.easeInOutQuart,
+                        //       elevation: 0,
+                        //       // bounce: true,
+                        //       // duration: const Duration(milliseconds: 400),
+                        //       backgroundColor: backgroundColor,
+                        //       // Set this to true
+                        //       // backgroundColor: Colors.transparent, // Set background color to transparent
+                        //       // useSafeArea: true,
+                        //       shape: const RoundedRectangleBorder(
+                        //           borderRadius: BorderRadius.only(
+                        //               topRight: Radius.circular(13),
+                        //               topLeft: Radius.circular(13))),
+                        //       isDismissible: true,
+                        //       // constraints: BoxConstraints.expand(
+                        //       //   height: MediaQuery.of(context).size.height,
+                        //       // ),
+                        //       builder: (d) {
+                        //         return TafseerAndTranslateSheet(
+                        //             surahNumber: surahNumber,
+                        //             isVerseByVerseSelection: false,
+                        //             verseNumber: verseNumber);
+                        //       });
+                        // },
+                        // child: SizedBox(
+                        //   width: MediaQuery.of(context).size.width,
+                        //   child: Row(
+                        //     children: [
+                        //       SizedBox(
+                        //         width: 20,
+                        //       ),
+                        //       Icon(
+                        //         FontAwesome5.book_open,
+                        //         color:
+                        //             LocalDB.getValue("quranPageolorsindex") ??
+                        //                     0 == 0
+                        //                 ? secondaryColors[
+                        //                     LocalDB.getValue(
+                        //                             "quranPageolorsindex") ??
+                        //                         0]
+                        //                 : highlightColors[LocalDB.getValue(
+                        //                         "quranPageolorsindex") ??
+                        //                     0],
+                        //       ),
+                        //       SizedBox(
+                        //         width: 20,
+                        //       ),
+                        //       Text(
+                        //           "${"tafseer".tr()} - ${"translation".tr()}",
+                        //           style: TextStyle(
+                        //               fontFamily: "cairo",
+                        //               fontSize: 14,
+                        //               color: primaryColors[LocalDB.getValue(
+                        //                       "quranPageolorsindex") ??
+                        //                   0])),
+                        //       SizedBox(
+                        //         width: 30,
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+                        // ),
                         // EasyContainer(
                         //   color: primaryColors[LocalDB.getValue("quranPageolorsindex") ?? 0]
                         //       .withOpacity(.05),
@@ -4298,14 +4322,12 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                         //     ),
                         //   ),
                         // ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         EasyContainer(
                           borderRadius: 8,
-                          color: primaryColors[
-                                  LocalDB.getValue("quranPageolorsindex") ?? 0]
-                              .withOpacity(.05),
+                          color: appPrimary.withOpacity(.05),
                           onTap: () async {
                             Navigator.pop(context);
                             // print(LocalDB.getValue("lastRead"));
@@ -4317,7 +4339,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                                 quran.getSurahNameEnglish(surahNumber),
                                 quran.getVerseCount(surahNumber),
                                 surahNumber,
-                                reciters[LocalDB.getValue("reciterindex") ?? 0]
+                                reciters[LocalDB.getValue("reciterIndex") ?? 0]
                                     .identifier);
                             // print("lastt read ${LocalDB.getValue("lastRead")}");
 
@@ -4354,7 +4376,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
 
                             qurapPagePlayerBloc.add(PlayFromVerse(
                                 verseNumber,
-                                reciters[LocalDB.getValue("reciterindex") ?? 0]
+                                reciters[LocalDB.getValue("reciterIndex") ?? 6]
                                     .identifier,
                                 surahNumber,
                                 quran.getSurahNameEnglish(surahNumber)));
@@ -4373,37 +4395,28 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                             width: MediaQuery.of(context).size.width,
                             child: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   width: 20,
                                 ),
-                                Icon(
+                                const Icon(
                                   FontAwesome5.book_reader,
-                                  color:
-                                      LocalDB.getValue("quranPageolorsindex") ??
-                                              0 == 0
-                                          ? secondaryColors[
-                                              LocalDB.getValue(
-                                                      "quranPageolorsindex") ??
-                                                  0]
-                                          : highlightColors[LocalDB.getValue(
-                                                  "quranPageolorsindex") ??
-                                              0],
+                                  color: appPrimary,
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 20,
                                 ),
-                                Text("play".tr(),
+                                Text("تشغيل",
                                     style: TextStyle(
                                         fontFamily: "cairo",
                                         fontSize: 14,
                                         color: primaryColors[LocalDB.getValue(
                                                 "quranPageolorsindex") ??
                                             0])),
-                                SizedBox(
+                                const SizedBox(
                                   width: 30,
                                 ),
                                 DropdownButton<int>(
-                                  value: LocalDB.getValue("reciterindex") ?? 0,
+                                  value: LocalDB.getValue("reciterIndex") ?? 0,
                                   dropdownColor: backgroundColors[
                                       LocalDB.getValue("quranPageolorsindex") ??
                                           0],
@@ -4435,7 +4448,7 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
                         const SizedBox(
                           height: 30,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 5,
                         ),
                       ],
@@ -5080,116 +5093,583 @@ class QuranDetailsPageState extends State<QuranDetailsPage> {
   }
 
   bool isDownloading = false;
-  Future<void> downloadAndCacheSuraAudio(
-      String suraName, int totalVerses, suraNumber, reciterIdentifier) async {
-    setState(() {
-      isDownloading = true;
-    });
+  //  final AudioConcatenator concatenator = AudioConcatenator();
 
-    final dio = Dio();
-    final appDir = await getTemporaryDirectory();
-    // final ffmpeg = FFmpegKit();
+  //Todo: from 1
+    // Option 1: Create a playlist instead of concatenating files
+//   Future<void> createAudioPlaylist(List<String> audioFilePaths, String playlistPath) async {
+//     final playlist = audioFilePaths.map((path) => {
+//       'file': path,
+//       'type': 'audio/mpeg'
+//     }).toList();
+    
+//     final playlistJson = json.encode(playlist);
+//     await File(playlistPath).writeAsString(playlistJson);
+//   }
 
-    final fullSuraFilePath =
-        "${appDir.path}-$reciterIdentifier-${suraName.replaceAll(" ", "")}.mp3";
+//   // Option 2: Simple binary concatenation (works for MP3)
+//   Future<void> concatenateAudioFiles(List<String> inputPaths, String outputPath) async {
+//     final outputFile = File(outputPath);
+//     final sink = outputFile.openWrite();
+    
+//     try {
+//       for (String inputPath in inputPaths) {
+//         final inputFile = File(inputPath);
+//         if (await inputFile.exists()) {
+//           final bytes = await inputFile.readAsBytes();
+//           sink.add(bytes);
+//         }
+//       }
+//     } finally {
+//       await sink.close();
+//     }
+//   }
 
-    // Check if the full sura file already exists
-    if (File(fullSuraFilePath).existsSync()) {
-      // print('Full sura audio file already cached: $fullSuraFilePath');
-    } else {
-      Fluttertoast.showToast(msg: "Downloading..");
-      final List<String> audioFilePaths = [];
-      List verseNumberAndDuration = [];
-      var startDuration = 0.0;
+//   // Option 3: Using WAV format for better concatenation
+//   Future<void> concatenateWavFiles(List<String> inputPaths, String outputPath) async {
+//     if (inputPaths.isEmpty) return;
+    
+//     final outputFile = File(outputPath);
+//     final sink = outputFile.openWrite();
+    
+//     try {
+//       // Read first file to get header
+//       final firstFile = File(inputPaths[0]);
+//       final firstBytes = await firstFile.readAsBytes();
+      
+//       // Write WAV header from first file
+//       sink.add(firstBytes.sublist(0, 44));
+      
+//       int totalDataSize = 0;
+      
+//       // Concatenate audio data from all files
+//       for (String inputPath in inputPaths) {
+//         final inputFile = File(inputPath);
+//         if (await inputFile.exists()) {
+//           final bytes = await inputFile.readAsBytes();
+//           // Skip WAV header (44 bytes) and write only audio data
+//           final audioData = bytes.sublist(44);
+//           sink.add(audioData);
+//           totalDataSize += audioData.length;
+//         }
+//       }
+      
+//       // Update file size in header
+//       await sink.close();
+//       await _updateWavHeader(outputPath, totalDataSize);
+      
+//     } catch (e) {
+//       await sink.close();
+//       throw e;
+//     }
+//   }
+  
+//   Future<void> _updateWavHeader(String filePath, int dataSize) async {
+//     final file = File(filePath);
+//     final randomAccessFile = await file.open(mode: FileMode.write);
+    
+//     try {
+//       // Update file size (at byte 4)
+//       await randomAccessFile.setPosition(4);
+//       await randomAccessFile.writeFrom(_intToBytes(dataSize + 36, 4));
+      
+//       // Update data chunk size (at byte 40)
+//       await randomAccessFile.setPosition(40);
+//       await randomAccessFile.writeFrom(_intToBytes(dataSize, 4));
+//     } finally {
+//       await randomAccessFile.close();
+//     }
+//   }
+  
+//   Uint8List _intToBytes(int value, int length) {
+//     final bytes = Uint8List(length);
+//     for (int i = 0; i < length; i++) {
+//       bytes[i] = (value >> (8 * i)) & 0xFF;
+//     }
+//     return bytes;
+//   }
+//   // REPLACE YOUR EXISTING downloadAndCacheSuraAudio METHOD WITH THIS:
+//   Future<void> downloadAndCacheSuraAudio(
+//       String suraName, int totalVerses, suraNumber, reciterIdentifier) async {
+    
+//     setState(() {
+//       isDownloading = true;
+//     });
+    
+//     final dio = Dio();
+//     final appDir = await getTemporaryDirectory();
+//     final audioPlayer = AudioPlayer();
+    
+//     final fullSuraFilePath =
+//         "${appDir.path}-$reciterIdentifier-${suraName.replaceAll(" ", "")}.mp3";
+    
+//     // Check if the full sura file already exists
+//     if (File(fullSuraFilePath).existsSync()) {
+//       // print('Full sura audio file already cached: $fullSuraFilePath');
+//       return;
+//     }
+    
+//     Fluttertoast.showToast(msg: "Downloading..");
+//     final List<String> audioFilePaths = [];
+//     List verseNumberAndDuration = [];
+//     var startDuration = 0.0;
+    
+//     for (int verse = 1; verse <= totalVerses; verse++) {
+//       final fileName =
+//           '$reciterIdentifier-${suraName.replaceAll(" ", "")}-$verse.mp3';
+//       final filePath = '${appDir.path}/$fileName';
+      
+//       // Check if the file already exists in the cache
+//       if (!File(filePath).existsSync()) {
+//         final audioUrl = quran.getAudioURLByVerse(
+//           suraNumber,
+//           verse,
+//           reciterIdentifier,
+//         );
+        
+//         try {
+//           await dio.download(audioUrl, filePath);
+//           await audioPlayer.setFilePath(filePath);
+//           final duration = audioPlayer.duration ?? Duration.zero;
+          
+//           verseNumberAndDuration.add({
+//             "verseNumber": verse,
+//             "startDuration": startDuration,
+//             "endDuration": startDuration + duration.inMilliseconds,
+//           });
+          
+//           startDuration = startDuration + duration.inMilliseconds;
+//         } catch (e) {
+//           print('Error downloading and caching audio: $e');
+//         }
+//       }
+      
+//       audioFilePaths.add(filePath);
+//     }
+    
+//     // Save duration data
+//     String jsonString = json.encode(verseNumberAndDuration);
+//     LocalDB.updateValue(
+//         "$reciterIdentifier-${suraName.replaceAll(" ", "")}-durations",
+//         jsonString.toString());
+    
+//     // REPLACE FFmpeg WITH: Simple binary concatenation (for MP3)
+//     try {
+//       await concatenateAudioFiles(audioFilePaths, fullSuraFilePath);
+//       Fluttertoast.showToast(msg: "Done...");
+//     } catch (e) {
+//       print('Error concatenating audio files: $e');
+//     }
+    
+//     // Generate JSON file with durations for the full sura audio
+//     final duration = await getAudioDuration(fullSuraFilePath);
+//     final verseDurations = List.generate(totalVerses, (verse) {
+//       return {'verse': verse + 1, 'duration': duration / totalVerses};
+//     });
+    
+//     final jsonFilePath = '${appDir.path}/$reciterIdentifier/${suraName.trim()}/verse_durations.json';
+//     await Directory('${appDir.path}/$reciterIdentifier/${suraName.trim()}').create(recursive: true);
+//     await File(jsonFilePath).writeAsString(jsonEncode(verseDurations));
+    
+//     print('JSON file with verse durations generated: $jsonFilePath');
+    
+//     setState(() {
+//       isDownloading = false;
+//     });
+//   }
+  
+//   // Alternative duration calculation using just_audio (recommended)
+//   Future<double> getAudioDuration(String filePath) async {
+//     return await getAudioDurationWithJustAudio(filePath);
+//   }
+  
+//   // Alternative 1: Using just_audio for duration (null-safe)
+//   Future<double> getAudioDurationWithJustAudio(String filePath) async {
+//     try {
+//       final player = AudioPlayer();
+//       await player.setAudioSource(AudioSource.uri(Uri.file(filePath)));
+//       final duration = player.duration;
+//       await player.dispose();
+      
+//       return duration?.inMilliseconds.toDouble() ?? 0.0;
+//     } catch (e) {
+//       print('Error getting audio duration with just_audio: $e');
+//       return 0.0;
+//     }
+//   }
 
-      for (int verse = 1; verse <= totalVerses; verse++) {
-        final fileName =
-            '$reciterIdentifier-${suraName.replaceAll(" ", "")}-$verse.mp3';
-        final filePath = '${appDir.path}/$fileName';
-        // print(filePath);
-        // Check if the file already exists in the cache
-        if (File(filePath).existsSync()) {
-          // print('Audio file already cached: $filePath');
-        } else {
-          final audioUrl = quran.getAudioURLByVerse(
-            suraNumber,
-            verse,
-            reciterIdentifier,
-          ); // Replace with the actual audio URL
-          try {
-            await dio.download(audioUrl, filePath);
-            // print('Audio file downloaded and cached: $filePath');
-            final metadata = await MetadataRetriever.fromFile(File(filePath));
-            verseNumberAndDuration.add({
-              "verseNumber": verse,
-              "startDuration": startDuration,
-              "endDuration": startDuration + ((metadata.trackDuration!))
-            });
-            startDuration = startDuration + ((metadata.trackDuration!));
-          } catch (e) {
-            // print('Error downloading and caching audio: $e');
-          }
-        }
+//   // Alternative 2: Using file size estimation (quick but approximate)
+//   Future<double> estimateAudioDurationFromFileSize(String filePath) async {
+//     try {
+//       final file = File(filePath);
+//       final fileSizeBytes = await file.length();
+      
+//       // Rough estimation: 128kbps MP3 = ~16KB per second
+//       // This is approximate - actual bitrate may vary
+//       const avgBitrateKbps = 128;
+//       const bytesPerSecond = (avgBitrateKbps * 1000) / 8;
+      
+//       return fileSizeBytes / bytesPerSecond;
+//     } catch (e) {
+//       print('Error estimating duration from file size: $e');
+//       return 0.0;
+//     }
+//   }
 
-        audioFilePaths.add(filePath);
+//   // Alternative 3: Parse MP3 header for more accurate duration (advanced)
+//   Future<double> getMP3Duration(String filePath) async {
+//     try {
+//       final file = File(filePath);
+//       final bytes = await file.readAsBytes();
+      
+//       // This is a simplified MP3 header parser
+//       // For production use, consider using a proper MP3 library
+//       int frameCount = 0;
+//       int sampleRate = 44100; // default
+//       int samplesPerFrame = 1152; // default for MP3
+      
+//       // Look for MP3 frame headers (0xFF followed by 0xE0-0xFF)
+//       for (int i = 0; i < bytes.length - 1; i++) {
+//         if (bytes[i] == 0xFF && (bytes[i + 1] & 0xE0) == 0xE0) {
+//           frameCount++;
+          
+//           // Extract sample rate from header if this is the first frame
+//           if (frameCount == 1 && i + 3 < bytes.length) {
+//             final byte2 = bytes[i + 2];
+//             final sampleRateIndex = (byte2 >> 2) & 0x03;
+//             final sampleRates = [44100, 48000, 32000, 0];
+//             sampleRate = sampleRates[sampleRateIndex];
+//           }
+//         }
+//       }
+      
+//       if (frameCount > 0 && sampleRate > 0) {
+//         return (frameCount * samplesPerFrame) / sampleRate;
+//       }
+      
+//       return 0.0;
+//     } catch (e) {
+//       print('Error parsing MP3 duration: $e');
+//       return 0.0;
+//     }
+//   }
+// }
+  //Todo: to 2
+  
+  // Future<void> downloadAndCacheSuraAudio(
+  //     String suraName, int totalVerses, suraNumber, reciterIdentifier) async {
+    
+  //   isDownloading = true;
+    
+  //   final dio = Dio();
+  //   final appDir = await getTemporaryDirectory();
+  //   final audioPlayer = AudioPlayer();
+    
+  //   final fullSuraFilePath =
+  //       "${appDir.path}-$reciterIdentifier-${suraName.replaceAll(" ", "")}.mp3";
+    
+  //   // Check if the full sura file already exists
+  //   if (File(fullSuraFilePath).existsSync()) {
+  //     print('Full sura audio file already cached: $fullSuraFilePath');
+  //     return;
+  //   }
+    
+  //   Fluttertoast.showToast(msg: "Downloading..");
+  //   final List<String> audioFilePaths = [];
+  //   List verseNumberAndDuration = [];
+  //   var startDuration = 0.0;
+    
+  //   for (int verse = 1; verse <= totalVerses; verse++) {
+  //     final fileName =
+  //         '$reciterIdentifier-${suraName.replaceAll(" ", "")}-$verse.mp3';
+  //     final filePath = '${appDir.path}/$fileName';
+      
+  //     // Check if the file already exists in the cache
+  //     if (!File(filePath).existsSync()) {
+  //       final audioUrl = quran.getAudioURLByVerse(
+  //         suraNumber,
+  //         verse,
+  //         reciterIdentifier,
+  //       );
+        
+  //       try {
+  //         await dio.download(audioUrl, filePath);
+  //         await audioPlayer.setFilePath(filePath);
+  //         final duration = audioPlayer.duration ?? Duration.zero;
+          
+  //         verseNumberAndDuration.add({
+  //           "verseNumber": verse,
+  //           "startDuration": startDuration,
+  //           "endDuration": startDuration + duration.inMilliseconds,
+  //         });
+          
+  //         startDuration = startDuration + duration.inMilliseconds;
+  //       } catch (e) {
+  //         print('Error downloading and caching audio: $e');
+  //       }
+  //     }
+      
+  //     audioFilePaths.add(filePath);
+  //   }
+    
+  //   // Save duration data
+  //   String jsonString = json.encode(verseNumberAndDuration);
+  //   LocalDB.updateValue(
+  //       "$reciterIdentifier-${suraName.replaceAll(" ", "")}-durations",
+  //       jsonString.toString());
+    
+  //   // OPTION 1: Simple binary concatenation (for MP3)
+  //   try {
+  //     await concatenator.concatenateAudioFiles(audioFilePaths, fullSuraFilePath);
+  //     Fluttertoast.showToast(msg: "Done...");
+  //   } catch (e) {
+  //     print('Error concatenating audio files: $e');
+  //   }
+    
+  //   // OPTION 2: Create playlist instead of concatenating
+  //   // final playlistPath = "${appDir.path}-$reciterIdentifier-${suraName.replaceAll(" ", "")}.json";
+  //   // await concatenator.createAudioPlaylist(audioFilePaths, playlistPath);
+    
+  //   // Generate JSON file with durations for the full sura audio
+  //   final duration = await getAudioDuration(fullSuraFilePath);
+  //   final verseDurations = List.generate(totalVerses, (verse) {
+  //     return {'verse': verse + 1, 'duration': duration / totalVerses};
+  //   });
+    
+  //   final jsonFilePath = '${appDir.path}/$reciterIdentifier/${suraName.trim()}/verse_durations.json';
+  //   await Directory('${appDir.path}/$reciterIdentifier/${suraName.trim()}').create(recursive: true);
+  //   await File(jsonFilePath).writeAsString(jsonEncode(verseDurations));
+    
+  //   print('JSON file with verse durations generated: $jsonFilePath');
+  // }
+  
+  // // Alternative duration calculation using just_audio
+  // Future<double> getAudioDuration(String filePath) async {
+  //   try {
+  //     final player = AudioPlayer();
+  //     await player.setFilePath(filePath);
+  //     final duration = player.duration;
+  //     await player.dispose();
+      
+  //     return duration?.inMilliseconds.toDouble() ?? 0.0;
+  //   } catch (e) {
+  //     print('Error getting audio duration: $e');
+  //     return 0.0;
+  //   }
+  // }
+Future<void> downloadAndCacheSuraAudio(
+    String suraName,
+    int totalVerses,
+    int suraNumber,
+    String reciterIdentifier,
+  ) async {
+  setState(() {
+    isDownloading = true;
+  });
+
+  final dio = Dio();
+  final appDir = await getTemporaryDirectory();
+  final audioPlayer = AudioPlayer();
+
+  final List<String> audioFilePaths = [];
+  List<Map<String, dynamic>> verseNumberAndDuration = [];
+  double startDuration = 0.0;
+
+  Fluttertoast.showToast(msg: "Downloading...");
+
+  for (int verse = 1; verse <= totalVerses; verse++) {
+    final fileName = '$reciterIdentifier-${suraName.replaceAll(" ", "")}-$verse.mp3';
+    final filePath = '${appDir.path}/$fileName';
+
+    // Download only if file doesn't exist
+    if (!File(filePath).existsSync()) {
+      final audioUrl = quran.getAudioURLByVerse(suraNumber, verse, reciterIdentifier);
+      try {
+        await dio.download(audioUrl, filePath);
+        print('Downloaded verse $verse');
+      } catch (e) {
+        print('Error downloading verse $verse: $e');
+        continue;
       }
-      // print(verseNumberAndDuration);
-      String jsonString = json.encode(verseNumberAndDuration);
-
-      LocalDB.updateValue(
-          "$reciterIdentifier-${suraName.replaceAll(" ", "")}-durations",
-          jsonString.toString());
-
-      String inputOptions =
-          audioFilePaths.map((filePath) => "-i $filePath").join(" ");
-      String cmd =
-          "$inputOptions -filter_complex 'concat=n=${audioFilePaths.length}:v=0:a=1[a]' -map '[a]' -codec:a libmp3lame -qscale:a 2 $fullSuraFilePath";
-
-      // final int resultCode =
-      // await FFmpegKit.executeAsync(cmd);
-
-      // if (resultCode == 0) {
-      //   // print('Full sura audio file combined successfully: $fullSuraFilePath');
-      //   Fluttertoast.showToast(msg: "Done...");
-      // } else {
-      //   // print(
-      //   // 'Error combining audio files: FFmpeg returned error code $resultCode');
-      // }
     }
 
-    // // Generate JSON file with durations for the full sura audio
-    // final duration = await getAudioDuration(fullSuraFilePath);
-    // final verseDurations = List.generate(totalVerses, (verse) {
-    //   return {'verse': verse + 1, 'duration': duration / totalVerses};
-    // });
+    // Get duration using just_audio
+    try {
+      await audioPlayer.setFilePath(filePath);
+      final duration = audioPlayer.duration ?? Duration.zero;
+      verseNumberAndDuration.add({
+        "verseNumber": verse,
+        "startDuration": startDuration,
+        "endDuration": startDuration + duration.inMilliseconds
+      });
+      startDuration += duration.inMilliseconds;
+    } catch (e) {
+      print('Error loading audio file: $e');
+    }
 
-    // final jsonFilePath = '${appDir.path}/$reciterIdentifier/${suraName.trim()}/verse_durations.json';
-    // File(jsonFilePath).writeAsString(jsonEncode(verseDurations));
-
-    // print('JSON file with verse durations for the full sura audio generated: $jsonFilePath');
+    audioFilePaths.add(filePath);
   }
 
-  // Future<double> getAudioDuration(String filePath) async {
-  //   final ffmpeg = FlutterFFmpeg();
-  //   final result =
-  //       await ffmpeg.executeWithArguments(['-i', filePath, '-f', 'null', '-']);
-  //   final durationMatch =
-  //       RegExp(r"Duration: ([\d:.]+)").firstMatch(result.toString());
+  // Save verse durations as JSON
+  final jsonString = json.encode(verseNumberAndDuration);
+  LocalDB.updateValue(
+      "$reciterIdentifier-${suraName.replaceAll(" ", "")}-durations",
+      jsonString);
 
-  //   if (durationMatch != null) {
-  //     final durationString = durationMatch.group(1);
-  //     final List<String> timeComponents = durationString!.split(':');
-  //     if (timeComponents.length == 3) {
-  //       final hours = int.parse(timeComponents[0]);
-  //       final minutes = int.parse(timeComponents[1]);
-  //       final seconds = double.parse(timeComponents[2]);
-  //       return hours * 3600 + minutes * 60 + seconds;
-  //     }
-  //   }
+  // Also save uniform split durations if needed
+  final totalAudioDuration = startDuration;
+  final verseDurations = List.generate(totalVerses, (index) {
+    return {
+      'verse': index + 1,
+      'duration': totalAudioDuration / totalVerses,
+    };
+  });
 
-  //   return 0.0; // Return 0 if duration extraction fails
-  // }
+  final jsonFilePath =
+      '${appDir.path}/$reciterIdentifier/${suraName.trim()}/verse_durations.json';
+
+  await File(jsonFilePath).create(recursive: true);
+  await File(jsonFilePath).writeAsString(jsonEncode(verseDurations));
+
+  Fluttertoast.showToast(msg: "Done downloading Sura");
 }
+
+  // Future<void> downloadAndCacheSuraAudio(
+  //     String suraName, int totalVerses, suraNumber, reciterIdentifier) async {
+//     setState(() {
+//       isDownloading = true;
+//     });
+
+//     final dio = Dio();
+//     final appDir = await getTemporaryDirectory();
+//     final audioPlayer = AudioPlayer();
+//     // final ffmpeg = FFmpegKit();
+
+//     final fullSuraFilePath =
+//         "${appDir.path}-$reciterIdentifier-${suraName.replaceAll(" ", "")}.mp3";
+
+//     // Check if the full sura file already exists
+//     if (File(fullSuraFilePath).existsSync()) {
+//       // print('Full sura audio file already cached: $fullSuraFilePath');
+//     } else {
+//       Fluttertoast.showToast(msg: "Downloading..");
+//       final List<String> audioFilePaths = [];
+//       List verseNumberAndDuration = [];
+//       var startDuration = 0.0;
+
+//       for (int verse = 1; verse <= totalVerses; verse++) {
+//         final fileName =
+//             '$reciterIdentifier-${suraName.replaceAll(" ", "")}-$verse.mp3';
+//         final filePath = '${appDir.path}/$fileName';
+//         // print(filePath);
+//         // Check if the file already exists in the cache
+//         if (File(filePath).existsSync()) {
+//           // print('Audio file already cached: $filePath');
+//         } else {
+//           final audioUrl = quran.getAudioURLByVerse(
+//             suraNumber,
+//             verse,
+//             reciterIdentifier,
+//           ); // Replace with the actual audio URL
+//           try {
+//             await dio.download(audioUrl, filePath);
+//             // print('Audio file downloaded and cached: $filePath');
+//             // final metadata = await MetadataRetriever.fromFile(File(filePath));
+//               await audioPlayer.setFilePath(filePath); // Load the downloaded file
+//        final duration = audioPlayer.duration ?? Duration.zero; // Get duration
+//             verseNumberAndDuration.add({
+//               "verseNumber": verse,
+//               "startDuration": startDuration,
+//               "endDuration": startDuration +  duration.inMilliseconds,// ((metadata.trackDuration!))
+//             });
+//             startDuration = startDuration +  duration.inMilliseconds; //metadata.trackDuration!));
+//           } catch (e) {
+//             print('Error downloading and caching audio: $e');
+//           }
+//         }
+
+//         audioFilePaths.add(filePath);
+//       }
+//       // print(verseNumberAndDuration);
+//       String jsonString = json.encode(verseNumberAndDuration);
+
+//       LocalDB.updateValue(
+//           "$reciterIdentifier-${suraName.replaceAll(" ", "")}-durations",
+//           jsonString.toString());
+
+//       String inputOptions =
+//           audioFilePaths.map((filePath) => "-i $filePath").join(" ");
+//       String cmd =
+//           "$inputOptions -filter_complex 'concat=n=${audioFilePaths.length}:v=0:a=1[a]' -map '[a]' -codec:a libmp3lame -qscale:a 2 $fullSuraFilePath";
+
+//       // final int resultCode =
+//       // await FFmpegKit.executeAsync(cmd);
+//       final session = await FFmpegKit.executeAsync(cmd);
+// final returnCode = await session.getReturnCode();
+
+//       if (returnCode?.isValueSuccess() ?? false) {
+//         // print('Full sura audio file combined successfully: $fullSuraFilePath');
+//         Fluttertoast.showToast(msg: "Done...");
+//       } else {
+//         // print(
+//         // 'Error combining audio files: FFmpeg returned error code $resultCode');
+//           Fluttertoast.showToast(msg: "Error combining audio files.");
+//       }
+//     }
+
+//     // Generate JSON file with durations for the full sura audio
+//     final duration = await getAudioDuration(fullSuraFilePath);
+//     final verseDurations = List.generate(totalVerses, (verse) {
+//       return {'verse': verse + 1, 'duration': duration / totalVerses};
+//     });
+
+//     final jsonFilePath = '${appDir.path}/$reciterIdentifier/${suraName.trim()}/verse_durations.json';
+//     File(jsonFilePath).writeAsString(jsonEncode(verseDurations));
+
+//     print('JSON file with verse durations for the full sura audio generated: $jsonFilePath');
+  // }
+Future<double> getAudioDuration(String filePath) async {
+  final player = AudioPlayer();
+
+  try {
+    await player.setFilePath(filePath);
+    final duration = player.duration;
+    await player.dispose();
+
+    if (duration != null) {
+      return duration.inSeconds.toDouble();
+    }
+  } catch (e) {
+    print("Error getting audio duration: $e");
+  }
+
+  return 0.0;
+}
+//   Future<double> getAudioDuration(String filePath) async {
+//     // final ffmpeg = FlutterFFmpeg();
+//     // final result =
+//     //     await ffmpeg.executeWithArguments(['-i', filePath, '-f', 'null', '-']);
+//     final session = await FFmpegKit.execute('-i "$filePath" -f null -');
+// final logs = await session.getAllLogsAsString();
+
+//     final durationMatch = RegExp(r"Duration: ([\d:.]+)").firstMatch(logs ?? '');
+//         // RegExp(r"Duration: ([\d:.]+)").firstMatch(result.toString());
+
+//     if (durationMatch != null) {
+//       final durationString = durationMatch.group(1);
+//       final List<String> timeComponents = durationString!.split(':');
+//       if (timeComponents.length == 3) {
+//         final hours = int.parse(timeComponents[0]);
+//         final minutes = int.parse(timeComponents[1]);
+//         final seconds = double.parse(timeComponents[2]);
+//         return hours * 3600 + minutes * 60 + seconds;
+//       }
+//     }
+
+//     return 0.0; // Return 0 if duration extraction fails
+//   }
+}
+
 
 class Result {
   bool includesQuarter;

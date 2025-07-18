@@ -20,15 +20,15 @@ part 'quran_page_player_state.dart';
 class QuranPagePlayerBloc
     extends Bloc<QuranPagePlayerEvent, QuranPagePlayerState> {
   QuranPagePlayerBloc() : super(QuranPagePlayerInitial()) {
-     AudioPlayer? audioPlayer;
+    AudioPlayer? audioPlayer;
 // audioPlayer.setPlayerMode(PlayerMode.mediaPlayer);
 
     on<QuranPagePlayerEvent>((event, emit) async {
       if (event is PlayFromVerse) {
-        if(audioPlayer!=null) {
+        if (audioPlayer != null) {
           audioPlayer!.dispose();
         }
-        audioPlayer=AudioPlayer();
+        audioPlayer = AudioPlayer();
         String storedJsonString = LocalDB.getValue(
             "${event.reciterIdentifier}-${event.suraName.replaceAll(" ", "")}-durations");
         // Decode the JSON string back into a list
@@ -37,9 +37,14 @@ class QuranPagePlayerBloc
         // Cast the decoded list to the appropriate type
         List durations = List.from(decodedList);
 
-        double duration = durations
-            .where((element) => element["verseNumber"] == event.verse)
-            .first["startDuration"];
+        final match = durations
+            .firstWhere((element) => element["verseNumber"] == event.verse);
+        if (match == null) {
+          Fluttertoast.showToast(msg: "Verse duration not found.");
+          return;
+        }
+        double duration = match["startDuration"];
+
         final appDir = await getTemporaryDirectory();
 
         final session = await AudioSession.instance;

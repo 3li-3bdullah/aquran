@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:quran/quran.dart';
 
 const Color primaryColor = Color(0xFF4A4039);
 const Color accentColor = Color.fromARGB(255, 141, 74, 29);
@@ -184,6 +183,12 @@ Color(0xff283618),
   Colors.black,
   Colors.black,
 ];
+ const Color appSecondary = Color(0xff0ea9a4);
+
+  /// primary figma properties
+  /// hex: #126d6a
+  /// opacity: 1
+ const Color appPrimary = Color(0xff126d6a);
 const List backgroundColors = [  Color.fromARGB(255, 255, 248, 240),
 Color(0xfffefae0),
   Color(0xffFFFCE7),
